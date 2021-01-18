@@ -3,34 +3,26 @@ import java.util.*;
 
 public class Plecak {
 
-    // dla lepszej czytelnosci ustawienie formatu z kg
     private static DecimalFormat waga = new DecimalFormat("0.00kg");
 
-    // maks ciezar obiektu
     static final double MAX_CIEZAR = 30;
 
-    // maks wartosc obiektu
     static final int MAX_WARTOSC = 190;
 
-    //ile obiektow wylosowac
     static int liczebnoscObiektow = 5;
 
-    // w tej tablicy elementy wszystkich rzeczy jakie mozemy zapakowac do plecaka
     static double[][] wyborObiektow = null;
 
-    // pojemnosc plecaka
     static int pojemnosc = 10;
 
     boolean[] wybor = null;
 
-    //konstruktor
     Plecak () {
         wybor = new boolean[liczebnoscObiektow];
         for (int i = 0; i < wybor.length; i ++)
             wybor[i] = false;
     }
 
-    //konstruktor kopiujacy
     Plecak (Plecak r) {
         wybor = new boolean[liczebnoscObiektow];
         for (int i = 0; i < wybor.length; i ++)
@@ -63,15 +55,12 @@ public class Plecak {
         return r;
     }
 
-    // statyczne metody
 
     static double[][] wypelnijObiektami() {
         java.util.Random ra = new java.util.Random();
         double[][] r = new double[liczebnoscObiektow][2];
         for (int i=0; i < r.length; i++) {
-            r[i][0]= (ra.nextDouble() * MAX_CIEZAR) + 0.5; // od 0,5 kg do (masymalny ciezar +0.5)
-            r[i][1]= ra.nextInt(MAX_WARTOSC) + 10; // od 10 do (maksymalna wartosc +10)
-        }
+            r[i][0]= (ra.nextDouble() * MAX_CIEZAR) + 0.5;r[i][1]= ra.nextInt(MAX_WARTOSC) + 10; }
         return r;
     }
 
@@ -83,10 +72,8 @@ public class Plecak {
         return r;
     }
 
-    // algorytmy genetyczne
-
     Plecak mutacja() {
-        // mutacja
+
         java.util.Random ra = new java.util.Random();
         int pos = ra.nextInt(wybor.length);
         Plecak r = new Plecak(this);
@@ -94,11 +81,10 @@ public class Plecak {
         return r;
     }
 
-    Plecak krzyzowanie(Plecak partner) { // krzyzowanie jednopunktowe
-        // krzyzowanie dwoch plecakow
+    Plecak krzyzowanie(Plecak partner) {
+
         java.util.Random ra = new java.util.Random();
-        int pos = ra.nextInt(wybor.length); // losowanie liczby z zakresu 0-1
-        Plecak r = new Plecak();
+        int pos = ra.nextInt(wybor.length);Plecak r = new Plecak();
         for (int i=0; i < pos; i++)
             r.wybor[i] = wybor[i];
         for (int i=pos; i < wybor.length; i++)
@@ -111,43 +97,30 @@ public class Plecak {
         else return wartosc();
     }
 
-    //glowna metoda
     static Plecak pakowanieGenetyka(int metoda_sel) {
 
-        int licz_osob = 100; // liczba osobnikow, tudziez plecakow, w populacji
-        int licz_naj = 20; // liczba najlepszych osobnikow (przetrwaja najsilniejsi)
-        int liczba_epok = liczebnoscObiektow * 30; // liczba generacji tych 'zyjatek'
-
+        int licz_osob = 100;int licz_naj = 20;int liczba_epok = liczebnoscObiektow * 30;
         int epoka = 0;
 
-        // Inicjalizacja poczatkowej generacji
         Plecak[] populacja = new Plecak[licz_osob];
-        // tablica plecakow - na niej bedziemy sie opierac w dalszym kodzie
 
-        // Mozliwosc 1: zaczynami z pustymi plecakami
         populacja[0] = new Plecak();
         populacja[1] = new Plecak();
 
         for (int i = 2; i < licz_naj; i++)
             populacja[i] = populacja[i % 2].mutacja();
-        // Testowanie rozmaitych generacji
+
         while(epoka < liczba_epok) {
-            // Krok 1: Mutacja i krzyzowanie
+
             for (int i = licz_naj; i < licz_osob; i++) {
                 java.util.Random ra = new java.util.Random();
-                // mutowanie z prawdopodobienstwem 0,7
+
                 if (ra.nextFloat() < 0.7) populacja[i] = populacja[i % licz_naj].mutacja();
-                    // krzyzowanie
+
                 else populacja[i] = populacja[i % licz_naj].krzyzowanie(populacja[ra.nextInt(licz_naj)]);
             }
-            // Krok 2: wybor najlepszego kandydata
-
-            //z ruletka albo bez
-
-            if(metoda_sel == 1){ // ruletka
-                // najwieksze szanse maja plecaki o najwiekszej wartosci
-                // chociaz szanse wygrania maja teorytycznie wszystkie, ktore nie sa za ciezkie
-                int totalFitness = -1;
+            
+            if(metoda_sel == 1){ int totalFitness = -1;
                 int ruleta[][] = new int[licz_osob][2];
                 for (int i = 0 ; i < licz_osob ; i++){
                     ruleta[i][0] = totalFitness + 1;
@@ -162,10 +135,7 @@ public class Plecak {
                     }
                 }
             } else
-            if(metoda_sel == 2){ // turniej
-                // osobniki dzielimy na podgrupy
-                // wybor deterministyczny - z grupy wychodza najlepsze osobniki
-                ArrayList[] groups = new ArrayList[licz_naj];
+            if(metoda_sel == 2){ ArrayList[] groups = new ArrayList[licz_naj];
                 for(int i = 0 ; i < licz_naj ; i++) groups[i] =
                         new ArrayList((int)(licz_osob / licz_naj) + 1);
                 int c = 0;
@@ -185,8 +155,7 @@ public class Plecak {
                     populacja[i] = populacja[najlepszyZGrupy];
                 }
 
-            }else // liniowy
-            {
+            }else {
                 for (int i = licz_naj ; i < licz_osob ; i ++) {
                     int gorsze_dop = Integer.MAX_VALUE;
                     int pos = -1;
@@ -199,10 +168,9 @@ public class Plecak {
                     if (pos >= 0) populacja[pos] = populacja[i];
                 }}
 
-            epoka++; // nastepna epoka
-
+            epoka++;
         }
-        // Na koniec najlepsze znalezione rozwiazanie
+
         int pos = -1;
         int naj_dop = 0;
         for (int i = 0; i < licz_osob; i ++)
