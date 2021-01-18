@@ -97,7 +97,7 @@ public class Plecak {
     Plecak krzyzowanie(Plecak partner) { // krzyzowanie jednopunktowe
         // krzyzowanie dwoch plecakow
         java.util.Random ra = new java.util.Random();
-        int pos = ra.nextInt(wybor.length);
+        int pos = ra.nextInt(wybor.length); // losowanie liczby z zakresu 0-1
         Plecak r = new Plecak();
         for (int i=0; i < pos; i++)
             r.wybor[i] = wybor[i];
