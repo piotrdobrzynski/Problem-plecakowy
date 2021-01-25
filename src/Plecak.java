@@ -13,7 +13,7 @@ public class Plecak {
 
     static double[][] wyborObiektow = null;
 
-    static int pojemnosc = 10;
+    static int pojemnosc = 50;
 
     boolean[] wybor = null;
 
@@ -87,47 +87,44 @@ public class Plecak {
 
     static Plecak algorytm(int metoda_sel) {
 
-        int licz_osob = 100;        int licz_naj = 20;        int liczba_epok = liczebnoscObiektow * 30;
+        int liczba_oso = 10;
+        int liczba_osob = liczba_oso + 1;
+        int liczba_epok = 200;
         int epoka = 0;
 
-        Plecak[] populacja = new Plecak[licz_osob];
-        populacja[0] = new Plecak();
-        populacja[1] = new Plecak();
+        Plecak[] populacja = new Plecak[liczba_osob];
 
-        for (int i = 2; i < licz_naj; i++)
-            populacja[i] = populacja[i % 2].mutacja();
+        for (int i = 0; i < liczba_osob; i++) {
+            populacja[i] = new Plecak();
+        }
+
         while(epoka < liczba_epok) {
-            for (int i = licz_naj; i < licz_osob; i++) {
-                java.util.Random ra = new java.util.Random();
-                if (ra.nextFloat() < 0.7) populacja[i] = populacja[i % licz_naj].mutacja();
-                else populacja[i] = populacja[i % licz_naj].krzyzowanie(populacja[ra.nextInt(licz_naj)]);
-            }
 
-            if(metoda_sel == 1){                               int totalFitness = -1;
-                int ruleta[][] = new int[licz_osob][2];
-                for (int i = 0 ; i < licz_osob ; i++){
+            if(metoda_sel == 1){
+                int totalFitness = 1;
+                int ruleta[][] = new int[liczba_osob][2];
+                for (int i = 0 ; i < liczba_osob ; i++){
                     ruleta[i][0] = totalFitness + 1;
                     totalFitness += populacja[i].dopasowanie();
                     ruleta[i][1] = totalFitness;
                 }
                 java.util.Random ra = new java.util.Random();
-                for(int i = 0 ; i < licz_naj ; i++){
+                for(int i = 0 ; i < liczba_oso ; i++){
                     int rand = ra.nextInt(totalFitness);
                     for(int j = 0 ; j < ruleta.length ; j++){
                         if(ruleta[j][0] <= rand && rand < ruleta[j][1]) { populacja[i]=populacja[j]; break; }
                     }
                 }
             } else
-            if(metoda_sel == 2){                                              ArrayList[] groups = new ArrayList[licz_naj];
-                for(int i = 0 ; i < licz_naj ; i++) groups[i] =
-                        new ArrayList((int)(licz_osob / licz_naj) + 1);
+            if(metoda_sel == 2){                                              ArrayList[] groups = new ArrayList[liczba_oso];
+                for(int i = 0 ; i < liczba_oso ; i++) groups[i] =
+                        new ArrayList((int)(liczba_osob / liczba_oso) + 1);
                 int c = 0;
-                for(int i = 0 ; i < licz_osob ; i++){
+                for(int i = 0 ; i < liczba_osob ; i++){
                     int[][] dopasowanie = { {i,} , {populacja[i].dopasowanie(),} };
                     groups[c].add(dopasowanie);
-                    c = c < 39 ? c++ : 0;
                 }
-                for(int i = 0 ; i < licz_naj ; i++){
+                for(int i = 0 ; i < liczba_oso ; i++){
                     int najlepszyZGrupy = 0;
                     int najlepszyFitness = 0;
                     Iterator it = groups[i].iterator ();
@@ -139,10 +136,10 @@ public class Plecak {
                 }
 
             }else            {
-                for (int i = licz_naj ; i < licz_osob ; i ++) {
+                for (int i = liczba_oso ; i < liczba_osob ; i ++) {
                     int gorsze_dop = Integer.MAX_VALUE;
                     int pos = -1;
-                    for (int j = 0; j < licz_naj; j ++)
+                    for (int j = 0; j < liczba_oso; j ++)
                         if (populacja[i].dopasowanie() > populacja[j].dopasowanie()
                                 && populacja[j].dopasowanie() < gorsze_dop) {
                             gorsze_dop = populacja[j].dopasowanie();
@@ -151,11 +148,17 @@ public class Plecak {
                     if (pos >= 0) populacja[pos] = populacja[i];
                 }}
 
+            for (int i = liczba_oso; i < liczba_osob; i++) {
+                java.util.Random ra = new java.util.Random();
+                if (ra.nextFloat() < 0.9) populacja[i] = populacja[i % liczba_oso].mutacja();
+                if (ra.nextFloat() < 0.5) populacja[i] = populacja[i % liczba_oso].krzyzowanie(populacja[ra.nextInt(liczba_oso)]);
+            }
+
             epoka++;
         }
         int pos = -1;
         int naj_dop = 0;
-        for (int i = 0; i < licz_osob; i ++)
+        for (int i = 0; i < liczba_osob; i ++)
             if (populacja[i].dopasowanie() > naj_dop) {
                 naj_dop = populacja[i].dopasowanie();
                 pos = i;
